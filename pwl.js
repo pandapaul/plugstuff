@@ -6,7 +6,7 @@ pwl.userLeaveCallback = function(user) {
   pwl.data[user.id] = {};
   pwl.data[user.id].leftAt = new Date().getTime();
   pwl.data[user.id].wlIndex = user.wlIndex;
-  console.log('user ' + user.username + ' left. saving data: leftAt = ' + pwl.data[user.id].leftAt + ' & wlIndex = ' + pwl.data[user.id].wlIndex);
+  //console.log('user ' + user.username + ' left. saving data: leftAt = ' + pwl.data[user.id].leftAt + ' & wlIndex = ' + pwl.data[user.id].wlIndex);
 }
 pwl.userJoinCallback = function(user) {
   if(pwl.data[user.id]) {
@@ -25,9 +25,9 @@ pwl.userJoinCallback = function(user) {
         };
         API.on(API.WAIT_LIST_UPDATE, moveDJ);
         API.moderateAddDJ(user.id);
-        API.sendChat('PWL: User ' + user.username + ' rejoined within 1 hour of leaving and has been restored to position ' + restoreToPosition + ' in the wait list.'); 
+        API.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and has been restored to position ' + restoreToPosition + ' in the wait list.'); 
       } else {
-        API.sendChat('PWL: User ' + user.username + ' rejoined within 1 hour of leaving and should be restored to position ' + restoreToPosition + ' in the wait list.'); 
+        API.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and should be restored to position ' + restoreToPosition + ' in the wait list.'); 
       }
     }
   }
@@ -40,7 +40,7 @@ pwl.chatCallback = function(chatData) {
   if(chatData.message[0] !== ';' && chatData.message[0] !== '!') return;
   if(chatData.message.toLowerCase().substring(1) === 'pwlrunning') {
     if(pwl.engaged) {
-      API.sendChat('Yes, @' + chatData.from + ', PWL is running.');
+      API.sendChat('PWL is running, @' + chatData.from);
     }
   }
 }
@@ -59,7 +59,7 @@ pwl.init = function(fullAuto) {
 }
 pwl.stop = function(stealth) {
   if(!stealth) {
-    API.sendChat('PWL: Disabled.');
+    API.sendChat('PWL: Disengaged.');
   }
   API.off(API.USER_JOIN, pwl.userJoinCallback);
   API.off(API.USER_LEAVE, pwl.userLeaveCallback);
