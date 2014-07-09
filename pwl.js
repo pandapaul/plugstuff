@@ -2,12 +2,14 @@
 var pwl = {};
 pwl.data = {};
 pwl.engaged = false;
+pwl.userRestoredMessage = 'PWL: @username rejoined within 1 hour of leaving and has been restored to position @position in the wait list.';
+
 pwl.userLeaveCallback = function(user) {
   pwl.data[user.id] = {};
   pwl.data[user.id].leftAt = new Date().getTime();
   pwl.data[user.id].wlIndex = user.wlIndex;
-  //console.log('user ' + user.username + ' left. saving data: leftAt = ' + pwl.data[user.id].leftAt + ' & wlIndex = ' + pwl.data[user.id].wlIndex);
 }
+
 pwl.userJoinCallback = function(user) {
   if(pwl.data[user.id]) {
     if(pwl.shouldUserBeRestored(pwl.data[user.id])) {
@@ -25,25 +27,33 @@ pwl.userJoinCallback = function(user) {
         };
         API.on(API.WAIT_LIST_UPDATE, moveDJ);
         API.moderateAddDJ(user.id);
-        API.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and has been restored to position ' + restoreToPosition + ' in the wait list.');
+        API.sendChat(pwl.userRestoredMessage.replace(/@username/,user.username).replace(/@position/,restoreToPosition));
       } else {
         API.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and should be restored to position ' + restoreToPosition + ' in the wait list.');
       }
     }
   }
 }
+
 pwl.shouldUserBeRestored = function(storedUserData) {
   var now = new Date().getTime();
   return storedUserData.leftAt + 5000 < now && storedUserData.leftAt + 3600000 > now && storedUserData.wlIndex > -1;
 }
+
 pwl.chatCallback = function(chatData) {
   if(chatData.message[0] !== ';' && chatData.message[0] !== '!') return;
-  if(chatData.message.toLowerCase().substring(1) === 'pwlrunning') {
+  var command = chatData.message.toLowerCase().substring(1);
+  if(command === 'pwlrunning') {
     if(pwl.engaged) {
       API.sendChat('PWL is running, @' + chatData.from);
     }
+  } else if(command === 'wtfispwl') {
+    if(pwl.engaged) {
+      API.sendChat('PWL is a Persistent Wait List. If you leave while in the wait list but return within an hour, it\'ll put you back where you were.');
+    }
   }
 }
+
 pwl.init = function(fullAuto) {
   pwl.stop(true);
   pwl.fullAuto = fullAuto;
@@ -57,6 +67,7 @@ pwl.init = function(fullAuto) {
   API.on(API.CHAT, pwl.chatCallback);
   pwl.engaged = true;
 }
+
 pwl.stop = function(stealth) {
   if(!stealth) {
     API.sendChat('PWL: Disengaged.');
@@ -66,16 +77,48 @@ pwl.stop = function(stealth) {
   API.off(API.CHAT, pwl.chatCallback);
   pwl.engaged = false;
 }
+
+pwl.gui = $('<div/>');
+pwl.gui.attr('id','pwlGui');
+pwl.gui.attr('style',"z-index:999;padding:10px;text-align:center;cursor:pointer;background:#282C35;border-radius:5px;position:absolute;left:10px;top:50px");
+pwl.gui.toggle = $('<div/>');
+pwl.gui.toggle.attr('id','pwlGui');
+pwl.gui.toggle.html('PWL Off');
+pwl.gui.customize = $('<div/>');
+pwl.gui.customize.attr('id','pwlCustomize');
+pwl.gui.customize.css('font-size','x-small');
+pwl.gui.customize.html('customize');
+pwl.gui.customize.input = $('<input type="text"/>');
+pwl.gui.customize.input.hide();
+pwl.gui.customize.input.attr('id','pwlCustomizeInput');
+pwl.gui.customize.input.attr('maxlength',240);
+pwl.gui.customize.input.css('margin-top',10);
+pwl.gui.customize.input.css('width',200);
+pwl.gui.customize.input.css('font-size','smaller');
+pwl.gui.customize.input.val(pwl.userRestoredMessage);
+
+pwl.gui.append(pwl.gui.toggle);
+pwl.gui.append(pwl.gui.customize);
+pwl.gui.append(pwl.gui.customize.input);
+
+pwl.gui.toggle.click(function(){
+  if(pwl.engaged) {
+    pwl.stop();
+    $(this).html('PWL Off');
+  } else {
+    pwl.init(API.hasPermission(null, API.ROLE.MANAGER));
+    $(this).html('PWL On');
+  }
+});
+
+pwl.gui.customize.click(function() {
+  pwl.gui.customize.input.fadeToggle();
+});
+
+pwl.gui.customize.input.keyup(function() {
+  pwl.userRestoredMessage = this.value;
+});
+
 pwl.showControls = function() {
-  $('#room').append($('<div id="pwlDiv" style="padding-top:10px;text-align:center;cursor:pointer;background:#282C35;border-radius:5px;width:100px;height:30px;position:absolute;left:10px;top:50px">PWL Off</div>'));
-  $('#pwlDiv').click(function(){
-    if(pwl.engaged) {
-      pwl.stop();
-      $(this).html('PWL Off');
-    } else {
-      pwl.init(API.hasPermission(null, API.ROLE.MANAGER));
-      $(this).html('PWL On');
-    }
-  });
-  
+  $('#room').append(pwl.gui);
 }();
