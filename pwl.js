@@ -97,6 +97,12 @@ pwl.gui.customize.input.css('width',200);
 pwl.gui.customize.input.css('font-size','smaller');
 pwl.gui.customize.input.val(pwl.userRestoredMessage);
 
+pwl.gui.normalColor = '#eee';
+pwl.gui.hoverColor = '#00b5e6';
+
+pwl.gui.toggle.hover(function(){$(this).css('color',pwl.gui.hoverColor);}, function(){$(this).css('color',pwl.gui.normalColor);})
+pwl.gui.customize.hover(function(){$(this).css('color',pwl.gui.hoverColor);}, function(){$(this).css('color',pwl.gui.normalColor);})
+
 pwl.gui.append(pwl.gui.toggle);
 pwl.gui.append(pwl.gui.customize);
 pwl.gui.append(pwl.gui.customize.input);
