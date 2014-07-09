@@ -2,7 +2,7 @@
 var pwl = {};
 pwl.data = {};
 pwl.engaged = false;
-pwl.userRestoredMessage = 'PWL: @username rejoined within 1 hour of leaving and has been restored to position @position in the wait list.';
+pwl.userRestoredMessage = '@username rejoined within 1 hour of leaving and has been restored to position @position in the wait list.';
 
 pwl.userLeaveCallback = function(user) {
   pwl.data[user.id] = {};
@@ -27,7 +27,7 @@ pwl.userJoinCallback = function(user) {
         };
         API.on(API.WAIT_LIST_UPDATE, moveDJ);
         API.moderateAddDJ(user.id);
-        API.sendChat(pwl.userRestoredMessage.replace(/@username/,user.username).replace(/@position/,restoreToPosition));
+        API.sendChat('PWL: ' + pwl.userRestoredMessage.replace(/@username/,user.username).replace(/@position/,restoreToPosition));
       } else {
         API.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and should be restored to position ' + restoreToPosition + ' in the wait list.');
       }
