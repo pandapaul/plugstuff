@@ -27,7 +27,7 @@ pwl.userJoinCallback = function(user) {
         };
         API.on(API.WAIT_LIST_UPDATE, moveDJ);
         API.moderateAddDJ(user.id);
-        API.sendChat('PWL: ' + pwl.userRestoredMessage.replace(/@username/,user.username).replace(/@position/,restoreToPosition));
+        API.sendChat('PWL: ' + pwl.userRestoredMessage.replace(/@username/i,user.username).replace(/@position/i,restoreToPosition));
       } else {
         API.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and should be restored to position ' + restoreToPosition + ' in the wait list.');
       }
