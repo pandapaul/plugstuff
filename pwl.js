@@ -80,13 +80,17 @@ pwl.stop = function(stealth) {
 
 pwl.gui = $('<div/>');
 pwl.gui.attr('id','pwlGui');
-pwl.gui.attr('style',"z-index:999;padding:10px;text-align:center;cursor:pointer;background:#282C35;border-radius:5px;position:absolute;left:10px;top:50px");
+pwl.gui.attr('style',"z-index:999;padding:10px;text-align:center;background:#282C35;border-radius:5px;position:absolute;left:10px;top:50px");
 pwl.gui.toggle = $('<div/>');
 pwl.gui.toggle.attr('id','pwlGui');
+pwl.gui.toggle.css('cursor','pointer');
+pwl.gui.toggle.css('display','inline-block');
 pwl.gui.toggle.html('PWL Off');
 pwl.gui.customize = $('<div/>');
 pwl.gui.customize.attr('id','pwlCustomize');
 pwl.gui.customize.css('font-size','x-small');
+pwl.gui.customize.css('cursor','pointer');
+pwl.gui.customize.css('display','inline-block');
 pwl.gui.customize.html('customize');
 pwl.gui.customize.input = $('<input type="text"/>');
 pwl.gui.customize.input.hide();
