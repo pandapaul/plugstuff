@@ -108,7 +108,9 @@ pwl.gui.toggle.hover(function(){$(this).css('color',pwl.gui.hoverColor);}, funct
 pwl.gui.customize.hover(function(){$(this).css('color',pwl.gui.hoverColor);}, function(){$(this).css('color',pwl.gui.normalColor);})
 
 pwl.gui.append(pwl.gui.toggle);
+pwl.gui.append('<br>');
 pwl.gui.append(pwl.gui.customize);
+pwl.gui.append('<br>');
 pwl.gui.append(pwl.gui.customize.input);
 
 pwl.gui.toggle.click(function(){
