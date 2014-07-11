@@ -3,7 +3,7 @@ var pwl = {};
 pwl.data = {};
 pwl.engaged = false;
 pwl.userRestoredMessageDefault = '@username rejoined within 1 hour of leaving and has been restored to position @position in the wait list.';
-pwl.userRestoredMessage = userRestoredMessageDefault;
+pwl.userRestoredMessage = pwl.userRestoredMessageDefault;
 
 pwl.userLeaveCallback = function(user) {
   pwl.data[user.id] = {};
