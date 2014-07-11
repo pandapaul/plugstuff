@@ -2,7 +2,8 @@
 var pwl = {};
 pwl.data = {};
 pwl.engaged = false;
-pwl.userRestoredMessage = '@username rejoined within 1 hour of leaving and has been restored to position @position in the wait list.';
+pwl.userRestoredMessageDefault = '@username rejoined within 1 hour of leaving and has been restored to position @position in the wait list.';
+pwl.userRestoredMessage = userRestoredMessageDefault;
 
 pwl.userLeaveCallback = function(user) {
   pwl.data[user.id] = {};
@@ -128,6 +129,9 @@ pwl.gui.customize.click(function() {
 });
 
 pwl.gui.customize.input.keyup(function() {
+  if(!this.value.trim().length) {
+    this.value = pwl.userRestoredMessageDefault;
+  }
   pwl.userRestoredMessage = this.value;
 });
 
