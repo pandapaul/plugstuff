@@ -24,6 +24,7 @@ pwl.waitListUpdateCallback = function(waitList) {
 };
 
 pwl.userJoinCallback = function(user) {
+  debugger;
   if(pwl.data[user.id] && pwl.shouldUserBeRestored(pwl.data[user.id])) {
     var restoreToPosition = Math.min(API.getWaitList().length, pwl.data[user.id].wlIndex + 1);
     if(pwl.fullAuto && API.hasPermission(null,API.ROLE.MANAGER)) {
@@ -39,16 +40,16 @@ pwl.userJoinCallback = function(user) {
       };
       API.on(API.WAIT_LIST_UPDATE, moveDJ);
       API.moderateAddDJ(user.id);
-      API.sendChat('PWL: ' + pwl.userRestoredMessage.replace(/@username/i,user.username).replace(/@position/i,restoreToPosition));
+      pwl.sendChat('PWL: ' + pwl.userRestoredMessage.replace(/@username/i,user.username).replace(/@position/i,restoreToPosition));
     } else {
-      API.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and should be restored to position ' + restoreToPosition + ' in the wait list.');
+      pwl.sendChat('PWL: ' + user.username + ' rejoined within 1 hour of leaving and should be restored to position ' + restoreToPosition + ' in the wait list.');
     }
   }
 };
 
 pwl.shouldUserBeRestored = function(storedUserData) {
   var now = new Date().getTime();
-  return storedUserData.leftAt + 5000 < now && storedUserData.leftAt + 3600000 > now && storedUserData.wlPosition > -1;
+  return storedUserData.leftAt + 1000 < now && storedUserData.leftAt + 3600000 > now && storedUserData.wlPosition > -1;
 };
 
 pwl.chatCallback = function(chatData) {
@@ -56,11 +57,11 @@ pwl.chatCallback = function(chatData) {
   var command = chatData.message.toLowerCase().substring(1);
   if(command === 'pwlrunning') {
     if(pwl.engaged) {
-      API.sendChat('PWL is running, @' + chatData.un);
+      pwl.sendChat('PWL is running, @' + chatData.un);
     }
   } else if(command === 'wtfispwl') {
     if(pwl.engaged) {
-      API.sendChat('PWL is a Persistent Wait List. If you leave while in the wait list but return within an hour, it\'ll put you back where you were.');
+      pwl.sendChat('PWL is a Persistent Wait List. If you leave while in the wait list but return within an hour, it\'ll put you back where you were.');
     }
   }
 };
@@ -69,22 +70,22 @@ pwl.init = function(fullAuto) {
   pwl.stop(true);
   pwl.fullAuto = fullAuto;
   API.on(API.USER_JOIN, pwl.userJoinCallback);
-  API.on(API.USER_LEAVE, pwl.userLeaveCallback);
+  API.on(API.WAIT_LIST_UPDATE, pwl.waitListUpdateCallback);
   API.on(API.CHAT, pwl.chatCallback);
   pwl.engaged = true;
   if(fullAuto) {
-    API.sendChat('PWL: Engaged in full auto.');
+    pwl.sendChat('PWL: Engaged in full auto.');
   } else {
-    API.sendChat('PWL: Engaged.');
+    pwl.sendChat('PWL: Engaged.');
   }
 };
 
 pwl.stop = function(stealth) {
   if(!stealth) {
-    API.sendChat('PWL: Disengaged.');
+    pwl.sendChat('PWL: Disengaged.');
   }
   API.off(API.USER_JOIN, pwl.userJoinCallback);
-  API.off(API.USER_LEAVE, pwl.userLeaveCallback);
+  API.off(API.WAIT_LIST_UPDATE, pwl.waitListUpdateCallback);
   API.off(API.CHAT, pwl.chatCallback);
   pwl.engaged = false;
 };
@@ -148,3 +149,11 @@ pwl.gui.customize.input.keyup(function() {
 pwl.showControls = function() {
   $('#room').append(pwl.gui);
 }();
+
+pwl.sendChat = function(msg) {
+  if(pwl.testing) {
+    API.chatLog(msg);
+  } else {
+    API.sendChat(msg);
+  }
+};
